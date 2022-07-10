@@ -8,11 +8,12 @@ require (
 	github.com/gin-gonic/gin v1.8.1
 	github.com/sijms/go-ora/v2 v2.2.15
 	github.com/thoas/go-funk v0.9.1
-	gorm.io/gorm v1.20.1
+	gorm.io/gorm v1.20.12
 )
 
 require (
 	github.com/cengsin/oracle v1.0.0 // indirect
+	github.com/gin-contrib/sessions v0.0.5 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-logfmt/logfmt v0.5.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
@@ -20,6 +21,9 @@ require (
 	github.com/go-playground/validator/v10 v10.11.0 // indirect
 	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/godror/godror v0.20.0 // indirect
+	github.com/gorilla/context v1.1.1 // indirect
+	github.com/gorilla/securecookie v1.1.1 // indirect
+	github.com/gorilla/sessions v1.2.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect

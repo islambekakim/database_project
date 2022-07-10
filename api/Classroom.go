@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database_project/auth"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/url"
@@ -13,33 +14,58 @@ type Classroom struct {
 }
 
 func CreateClass(context *gin.Context) {
+	if auth.IsAdmin() {
 
-	capasity, _ := strconv.Atoi(context.PostForm("capacity"))
+		capasity, _ := strconv.Atoi(context.PostForm("capacity"))
 
-	var classroom = Classroom{
-		Classroom_id: -1,
-		Capacity:     capasity,
+		var classroom = Classroom{
+			Classroom_id: -1,
+			Capacity:     capasity,
+		}
+
+		auth.DB.Create(&classroom)
+
+		location := url.URL{Path: "/classroom"}
+		context.Redirect(http.StatusSeeOther, location.RequestURI())
+	} else {
+		context.Redirect(http.StatusSeeOther, "")
 	}
+}
 
-	DB.Create(&classroom)
-
-	location := url.URL{Path: "/admin/classroom"}
-	context.Redirect(http.StatusSeeOther, location.RequestURI())
+func GetClassByID(context *gin.Context) {
+	//if auth.IsAdmin() {
+	classroom := Classroom{}
+	auth.DB.Where("Classroom_id", context.Param("classroom_id")).Find(&classroom)
+	//context.HTML(http.StatusOK, "Teacher.gohtml", gin.H{
+	//	"teachers": teacher,
+	//})
+	context.IndentedJSON(http.StatusOK, &classroom)
+	//} else {
+	//	context.Redirect(http.StatusSeeOther, "")
+	//}
 }
 
 func GetClass(context *gin.Context) {
-	classrooms := []Classroom{}
-	DB.Find(&classrooms)
-	context.HTML(http.StatusOK, "Classroom.gohtml", gin.H{
-		"classrooms": classrooms,
-	})
+	if auth.IsAdmin() {
+
+		classrooms := []Classroom{}
+		auth.DB.Find(&classrooms)
+		context.HTML(http.StatusOK, "Classroom.gohtml", gin.H{
+			"classrooms": classrooms,
+		})
+	} else {
+		context.Redirect(http.StatusSeeOther, "")
+	}
 }
 
 func DeleteClass(context *gin.Context) {
+	if auth.IsAdmin() {
 
-	var class Classroom
-	DB.Where("classroom_id = ?", context.Param("id")).Delete(&class)
-	location := url.URL{Path: "/admin/classroom"}
-	context.Redirect(http.StatusTemporaryRedirect, location.RequestURI())
-
+		var class Classroom
+		auth.DB.Where("classroom_id = ?", context.Param("id")).Delete(&class)
+		location := url.URL{Path: "/classroom"}
+		context.Redirect(http.StatusTemporaryRedirect, location.RequestURI())
+	} else {
+		context.Redirect(http.StatusSeeOther, "")
+	}
 }

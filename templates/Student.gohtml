@@ -7,8 +7,9 @@
 <body>
 <a href="/admin">return</a>
 
+
     <div class="Create">
-        <form method="post" action="/admin/student/create">
+        <form method="post" action="student/create">
             <label>
                 <input type="text" name="FirstName" value="fff">
             </label>
@@ -54,7 +55,7 @@
                     <td>{{.Lastlogin}}</td>
                     <td>Edit</td>
                     <td>
-                        <form action="/admin/student/delete/{{.Student_id}}" method="GET">
+                        <form action="/student/delete/{{.Student_id}}" method="GET">
                             <button>
                                 Delete
                             </button>

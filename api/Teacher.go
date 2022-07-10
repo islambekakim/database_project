@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database_project/auth"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"net/url"
@@ -18,41 +19,64 @@ type Teacher struct {
 }
 
 func CreateTeacher(context *gin.Context) {
+	if auth.IsAdmin() {
 
-	first := context.PostForm("FirstName")
-	last := context.PostForm("LastName")
-	login := context.PostForm("Login")
-	password := context.PostForm("Password")
-	reg := time.Now()
+		first := context.PostForm("FirstName")
+		last := context.PostForm("LastName")
+		login := context.PostForm("Login")
+		password := context.PostForm("Password")
+		reg := time.Now()
 
-	var teacher = Teacher{
-		Teacher_id:  -1,
-		First_name:  first,
-		Last_name:   last,
-		Login:       login,
-		Password:    password,
-		Registredon: reg,
+		var teacher = Teacher{
+			Teacher_id:  -1,
+			First_name:  first,
+			Last_name:   last,
+			Login:       login,
+			Password:    password,
+			Registredon: reg,
+		}
+
+		auth.DB.Create(&teacher)
+
+		location := url.URL{Path: "/teacher"}
+		context.Redirect(http.StatusSeeOther, location.RequestURI())
+	} else {
+		context.Redirect(http.StatusSeeOther, "")
 	}
-
-	DB.Create(&teacher)
-
-	location := url.URL{Path: "/admin/teacher"}
-	context.Redirect(http.StatusSeeOther, location.RequestURI())
 }
 
 func GetTeachers(context *gin.Context) {
-	teachers := []Teacher{}
-	DB.Find(&teachers)
-	context.HTML(http.StatusOK, "Teacher.gohtml", gin.H{
-		"teachers": teachers,
-	})
+	if auth.IsAdmin() { // if isAdmin opens all teachers
+		teachers := []Teacher{}
+		auth.DB.Find(&teachers)
+		context.HTML(http.StatusOK, "Teacher.gohtml", gin.H{
+			"teachers": teachers,
+		})
+	} else { // else you'll redirect to url "admin/"
+		context.Redirect(http.StatusSeeOther, "")
+	}
+}
+func GetTeacherByID(context *gin.Context) {
+	//if auth.IsAdmin() {
+	teacher := Teacher{}
+	auth.DB.Where("Teacher_id", context.Param("teacher_id")).Find(&teacher)
+	//context.HTML(http.StatusOK, "Teacher.gohtml", gin.H{
+	//	"teachers": teacher,
+	//})
+	context.IndentedJSON(http.StatusOK, &teacher)
+	//} else {
+	//	context.Redirect(http.StatusSeeOther, "")
+	//}
 }
 
 func DeleteTeacher(context *gin.Context) {
+	if auth.IsAdmin() {
 
-	var teacher Teacher
-	DB.Where("teacher_id = ?", context.Param("id")).Delete(&teacher)
-	location := url.URL{Path: "/admin/teacher"}
-	context.Redirect(http.StatusTemporaryRedirect, location.RequestURI())
-
+		var teacher Teacher
+		auth.DB.Where("teacher_id = ?", context.Param("id")).Delete(&teacher)
+		location := url.URL{Path: "/teacher"}
+		context.Redirect(http.StatusTemporaryRedirect, location.RequestURI())
+	} else {
+		context.Redirect(http.StatusSeeOther, "")
+	}
 }
